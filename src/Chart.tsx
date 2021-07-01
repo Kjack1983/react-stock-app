@@ -4,6 +4,111 @@ import React, {
 } from 'react';
 import { CanvasJSChart } from 'canvasjs-react-charts';
 import { fetchStockDataForSymbol } from './ApiConnector';
+import {
+    Select,
+    FormHelperText,
+    Typography, 
+    FormControl, 
+    InputLabel, 
+    MenuItem,
+    Input,
+    makeStyles,
+    Grid
+} from '@material-ui/core';
+
+const useStyles = makeStyles(theme => ({
+	root: {
+		"& .MuiFormControl-root": {
+			width: "20%",
+			marginLeft: '10px',
+			marginBottom: '5px'
+		},
+		"& .MuiButtonBase-root": {
+			marginTop: '20px'
+		},
+		"& .Mui-selected": {
+			background: '#e0e0e0',
+			"&:hover": {
+				background: '#e0e0e0',
+			}
+		},
+		"& .MuiTypography-body1": {
+			fontWeight: '300'
+		},
+		"& .MuiFormLabel-root": {
+			fontSize: '16px',
+			color: '#0f5b8e',
+		},
+		"& .MuiInputBase-root": {
+			marginTop: '19px'
+		},
+		"& .MuiIconButton-colorInherit": {
+			marginTop: '0px'
+		},
+		"& .MuiTablePagination-toolbar": {
+			fontWeight: '400',
+			fontStyle: 'italic',
+			color: '#4d4e52'
+		},
+		"& .MuiTablePagination-selectRoot": {
+			marginTop: '8px',
+			marginLeft: '0px',
+			marginRight: '10px'
+		},
+		"& .MuiTablePagination-select": {
+			fontSize: '15px'
+		},
+		"& .MuiTablePagination-caption": {
+			fontSize: '15px'
+		},
+		"& .MuiTab-root": {
+			minWidth: '120px'
+		},
+		"&. MuiPaper-elevation4": {
+			boxShadow: 'none'
+		},
+	},
+	visuallyHidden: {
+		border: 0,
+		clip: "rect(0 0 0 0)",
+		height: 1,
+		margin: -1,
+		overflow: "hidden",
+		padding: 0,
+		position: "absolute",
+		top: 20,
+		width: 1
+	},
+	labelContainer: {
+		paddingLeft: 0,
+		paddingRight: 0
+	},
+	formControl: {
+		width: "100%",
+		"& label span": {
+			color: "red"
+		},
+		paddingRight: '25px'
+	},
+	titleDescription: {
+		fontWeight: 'bold',
+		color: '#3f51b5',
+	},
+	tabContainer: {
+		boxShadow: 'none'
+	},
+	tabStyle: {
+		minWidth: 100,
+		paddingLeft: 12,
+		paddingRight: 12
+	},
+	pageContent: {
+		padding: theme.spacing(1)
+	},
+	searchInput: {
+		width: '75%'
+	},
+}))
 
 interface StockValues {
     date: string,
@@ -42,23 +147,39 @@ interface ChartValues {
  * @param {string} symbol
  * @return {object} { stockData, setStockData }
  */
-const useFormatFetchedData = (symbol:string):FormatedData => {
+const useFormatFetchedData = (symbol:string):any => {
+    const [company, setCompany] = useState<string[]>(['GOOGL', 'FB', 'TWTR', 'AMZN']);
+    const [selectedCompany, setSelectedCompany] = useState<string>('GOOGL');
     const [stockData, setStockData] = useState<StockValues[]>([]);
+    
+    const handleChange = (event:any):void => {
+        setSelectedCompany(event.target.value);
+    }
+
+    const fetchStockData = async (symbol: string) => {
+        const response = await fetchStockDataForSymbol(symbol);
+        const result = await response.json();
+        setStockData(constructStockData(result['Time Series (Daily)']));
+    };
 
     // Fetch daily stock chart for GOOGL when the component mounts
     useEffect(() => {
-        const fetchStockData = async () => {
-            const response = await fetchStockDataForSymbol(symbol);
-            const result = await response.json();
-            setStockData(constructStockData(result['Time Series (Daily)']));
-        };
-
-        fetchStockData();
+        fetchStockData(symbol);
     }, []);
 
+    // Fetch daily stock values for selected company.
+    useEffect(() => {
+        fetchStockData(selectedCompany);
+    }, [selectedCompany])
+    
     return {
+        company,
+        setCompany,
+        selectedCompany,
+        setSelectedCompany,
+        handleChange,
         stockData,
-        setStockData
+        setStockData,
     };
 };
 
@@ -81,7 +202,7 @@ const constructStockData = (stockData:ChartValues[]): StockValues[] => {
 }
 
 /**
- * toggle hide and show candlesticks.
+ * toggle display of candlesticks.
  *
  * @param {e} object
  * @return {void}
@@ -120,13 +241,42 @@ const chartFormatedData = (stockData: StockValues[]):FormatedStockValues[] => {
  * @return {JSX}
  */
 const Chart: React.FC<{symbol: string}> = ({symbol}):JSX.Element => {
+    
+    const classes = useStyles();
+
     // Obtain daily stock chart for GOOGL when the component mounts
-    const objHolderStockData = useFormatFetchedData(symbol);
-
-    // Destructure getter and setters stock values.
-    let { stockData, setStockData } = objHolderStockData;
-
+    const { 
+        stockData,
+        company,
+        selectedCompany,
+        handleChange 
+    } = useFormatFetchedData(symbol);
+    
     return (
+        <React.Fragment>
+        <FormControl className={classes.formControl}>
+            <InputLabel
+                disableAnimation={false}
+                htmlFor="Stock"
+            >
+                Stock *
+                </InputLabel>
+            <Select
+                value={company}
+                onChange={(event) => {
+                    handleChange(event)
+                }}
+                input={<Input name="company" id="company" />}
+            >
+                <MenuItem selected disabled value=""><em>Please select</em></MenuItem>
+                {company.map(option => {
+                    return <MenuItem key={option} value={option}>
+                            {option}
+                        </MenuItem>
+                })}
+            </Select>
+            <FormHelperText>Select cron job category</FormHelperText>
+        </FormControl>
         <CanvasJSChart
             options={ {
                 animationEnabled: true,
@@ -134,7 +284,7 @@ const Chart: React.FC<{symbol: string}> = ({symbol}):JSX.Element => {
                 theme: "dark1",
                 exportEnabled: true,
                 title: {
-                    text: "Historical data Google"
+                    text: `Historical data ${selectedCompany}`
                 },
                 subtitles: [{
                     text: "Weekly Averages"
@@ -221,6 +371,7 @@ const Chart: React.FC<{symbol: string}> = ({symbol}):JSX.Element => {
                 ]
             } }
         />
+        </React.Fragment>
     );
 };
 
