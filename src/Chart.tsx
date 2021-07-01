@@ -19,6 +19,22 @@ interface FormatedData {
     setStockData: any
 }
 
+interface ItemData {
+    open: number,
+    high: number,
+    low: number,
+    close: number
+}
+
+interface FormatedStockValues {
+    x: Date,
+    y: number[]
+}
+
+interface ChartValues {
+    values: StockValues[]
+}
+
 /**
  * Custom hook to provide the stock data after 
  * the dom is being rendered.
@@ -52,9 +68,8 @@ const useFormatFetchedData = (symbol:string):FormatedData => {
  * @param {array} stockData 
  * @return {object}
  */
-const constructStockData = (stockData:any[]): StockValues[] => {
-    // Convert stockData from an object to an array
-    return Object.entries(stockData).map(([date, priceData]) => {
+const constructStockData = (stockData:ChartValues[]): StockValues[] => {
+    return Object.keys(stockData).length !== 0 ? Object.entries(stockData).map(([date, priceData]) => {
         return {
             date,
             open: Number(priceData['1. open']),
@@ -62,7 +77,40 @@ const constructStockData = (stockData:any[]): StockValues[] => {
             low: Number(priceData['3. low']),
             close: Number(priceData['4. close'])
         }
-    });
+    }): [];
+}
+
+/**
+ * toggle hide and show candlesticks.
+ *
+ * @param {e} object
+ * @return {void}
+ */
+const toggleDataSeries = (e):void => {
+	if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+		e.dataSeries.visible = false;
+	} else {
+		e.dataSeries.visible = true;
+	}
+	e.chart.render();
+}
+
+/**
+ * Return stock value data.
+ * 
+ * @param stockData
+ * 
+ * @[todo] check FormatedStockValues interface.
+ * @return {object<FormatedStockValues>} 
+ */
+const chartFormatedData = (stockData: StockValues[]):FormatedStockValues[] => {
+    return Array.isArray(stockData) && stockData.length ? stockData.map((stockValue) => {
+        let {date, open, high, low, close} = stockValue;
+        return {
+            x: new Date(date),
+            y: [open, high, low, close]
+        }
+    }) : []; 
 }
 
 /**
@@ -91,7 +139,16 @@ const Chart: React.FC<{symbol: string}> = ({symbol}):JSX.Element => {
                 subtitles: [{
                     text: "Weekly Averages"
                 }],
+                toolTip: {
+                    shared: true
+                },
+                legend: {
+                    reversed: true,
+                    cursor: "pointer",
+                    itemclick: toggleDataSeries
+                }, 
                 axisY: {
+                    prefix: "$",
                     // Minimum value is 10% less than the lowest price in the dataset
                     minimum: Math.min(...stockData.map(data => data.low)) / 1.1,
                     // Minimum value is 10% more than the highest price in the dataset
@@ -137,16 +194,30 @@ const Chart: React.FC<{symbol: string}> = ({symbol}):JSX.Element => {
                         }, [])
                     }
                 },
+                axisY2: {
+                    prefix: "$",
+                    suffix: "bn",
+                    title: "Revenue & Income",
+                    tickLength: 0
+                },
                 data: [
                     {
                         type: 'candlestick',
-                        dataPoints: stockData.map(({date, open, high, low, close}) => {
-                            return {
-                                x: new Date(date),
-                                y: [open, high, low, close]
-                            }
-                        })
-                    }
+                        showInLegend: true,
+                        name: "Stock Price",
+                        yValueFormatString: "$#,##0.00",
+                        xValueFormatString: "MMMM",
+                        dataPoints: chartFormatedData(stockData)
+                    },
+                    {
+                        type: "line",
+                        showInLegend: true,
+                        name: "Net Income",
+                        axisYType: "secondary",
+                        yValueFormatString: "$#,##0.00bn",
+                        xValueFormatString: "MMMM",
+                        dataPoints: chartFormatedData(stockData)
+                    },
                 ]
             } }
         />

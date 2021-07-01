@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import Chart from './Chart';
 import { hot } from 'react-hot-loader';
 
-
 const AppContainer = styled.div`
     margin: 1rem;
     font-family: Arial, Helvetica, sans-serif;
