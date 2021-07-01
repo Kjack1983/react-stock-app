@@ -19,13 +19,13 @@ import {
 const useStyles = makeStyles(theme => ({
 	root: {
 		"& .MuiFormControl-root": {
-			width: "20%",
+			width: "20% ",
 			marginLeft: '10px',
 			marginBottom: '5px'
 		},
 		"& .MuiButtonBase-root": {
 			marginTop: '20px'
-		},
+        },
 		"& .Mui-selected": {
 			background: '#e0e0e0',
 			"&:hover": {
@@ -118,12 +118,6 @@ interface StockValues {
     close: number
 }
 
-// @todo need to check the types.
-interface FormatedData {
-    stockData: any[],
-    setStockData: any
-}
-
 interface ItemData {
     open: number,
     high: number,
@@ -137,8 +131,20 @@ interface FormatedStockValues {
 }
 
 interface ChartValues {
-    values: StockValues[]
+    date: string,
+    values: ItemData[]
 }
+
+
+interface EnumStockItem {
+    date: string,
+    open: number,
+    high: number,
+    low: number,
+    close: number
+}
+
+interface EnumStockItems extends Array<EnumStockItem>{}
 
 /**
  * Custom hook to provide the stock data after 
@@ -147,8 +153,8 @@ interface ChartValues {
  * @param {string} symbol
  * @return {object} { stockData, setStockData }
  */
-const useFormatFetchedData = (symbol:string):any => {
-    const [company, setCompany] = useState<string[]>(['GOOGL', 'FB', 'TWTR', 'AMZN']);
+const useFormatFetchedData = (symbol:string):{company: string[], selectedCompany: string, handleChange:(event:any) => void, stockData:any[]} => {
+    const [company] = useState<string[]>(['GOOGL', 'FB', 'TWTR', 'AMZN']);
     const [selectedCompany, setSelectedCompany] = useState<string>('GOOGL');
     const [stockData, setStockData] = useState<StockValues[]>([]);
     
@@ -159,6 +165,9 @@ const useFormatFetchedData = (symbol:string):any => {
     const fetchStockData = async (symbol: string) => {
         const response = await fetchStockDataForSymbol(symbol);
         const result = await response.json();
+
+        console.log('stockData >>>>', constructStockData(result['Time Series (Daily)']));
+
         setStockData(constructStockData(result['Time Series (Daily)']));
     };
 
@@ -174,12 +183,9 @@ const useFormatFetchedData = (symbol:string):any => {
     
     return {
         company,
-        setCompany,
         selectedCompany,
-        setSelectedCompany,
         handleChange,
-        stockData,
-        setStockData,
+        stockData
     };
 };
 
@@ -190,6 +196,9 @@ const useFormatFetchedData = (symbol:string):any => {
  * @return {object}
  */
 const constructStockData = (stockData:ChartValues[]): StockValues[] => {
+
+    console.log(stockData);
+
     return Object.keys(stockData).length !== 0 ? Object.entries(stockData).map(([date, priceData]) => {
         return {
             date,
@@ -252,6 +261,13 @@ const Chart: React.FC<{symbol: string}> = ({symbol}):JSX.Element => {
         handleChange 
     } = useFormatFetchedData(symbol);
     
+    /* const displayCompanies = () => {
+        return company.reduce((acc, curr) => {
+            acc = [...acc, {value: curr, label: curr}]
+            return acc;
+        }, []);
+    } */
+
     return (
         <React.Fragment>
         <FormControl className={classes.formControl}>
@@ -262,7 +278,7 @@ const Chart: React.FC<{symbol: string}> = ({symbol}):JSX.Element => {
                 Stock *
                 </InputLabel>
             <Select
-                value={company}
+                value={selectedCompany}
                 onChange={(event) => {
                     handleChange(event)
                 }}
@@ -271,8 +287,8 @@ const Chart: React.FC<{symbol: string}> = ({symbol}):JSX.Element => {
                 <MenuItem selected disabled value=""><em>Please select</em></MenuItem>
                 {company.map(option => {
                     return <MenuItem key={option} value={option}>
-                            {option}
-                        </MenuItem>
+                        {option}
+                    </MenuItem>
                 })}
             </Select>
             <FormHelperText>Select cron job category</FormHelperText>
