@@ -12,12 +12,12 @@
       "dom.iterable",
       "esnext"
     ],
-    "noImplicitAny":false,
+    "noImplicitAny": false,
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": false,
+    "isolatedModules": true,
     "noEmit": true,
     "jsx": "react"
   },

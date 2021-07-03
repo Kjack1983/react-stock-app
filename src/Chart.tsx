@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, Dispatch, useEffect } from "react";
 import { CanvasJSChart } from "canvasjs-react-charts";
 import { fetchStockDataForSymbol } from "./connection/ApiConnector";
 import {
@@ -85,7 +85,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
 /**
  * Custom hook to provide the stock data after
  * the dom is being rendered.
@@ -96,39 +95,48 @@ const useStyles = makeStyles((theme) => ({
 const useFormatFetchedData = (symbol: string, size: string): ReturnedMappedValues => {
   const [company] = useState<string[]>(["GOOGL", "FB", "TWTR", "AMZN", "IBM"]);
   const [outputsize] = useState<string[]>(['compact', 'full']);
-  const [selectedOutputSize, setSelectedOutputSize] = useState<string>('compact');
-  const [selectedCompany, setSelectedCompany] = useState<string>("GOOGL");
-  const [stockData, setStockData] = useState<StockValues[]>([]);
+  
+  // New API option values.
+  const [selectedValue, setSelectedValue] = useState<any>({
+	  dataSize: 'compact',
+	  deriveCompany: 'GOOGL'
+  });
 
-  const handleChange = (event: any): void => {
-    setSelectedCompany(event.target.value);
-  };
+  // Destructure in order to feed new API options. 
+  let {dataSize, deriveCompany} = selectedValue;
+
+  const [stockData, setStockData] = useState<StockValues[]>([]);
+  
+  // handle options.
+  const handleChangeValues = (event:any, name: string):void => {
+	let { target } = event;
+	setSelectedValue({
+		...selectedValue,
+		[name]: target.value
+	})
+  }
 
   const fetchStockData = async (symbol: string, size: string) => {
     const response = await fetchStockDataForSymbol(symbol, size);
     const result = await response.json();
-
-    // [date: "2021-07-01", open: 2434.5, high: 2451.74, low: 2430.63, close: 2448.89]
-    setStockData(constructStockData(result["Time Series (Daily)"]));
+	setStockData(constructStockData(result["Time Series (Daily)"]));
   };
 
   // Fetch daily stock chart for GOOGL when the component mounts
   useEffect(() => {
-    fetchStockData(symbol, selectedOutputSize);
+    fetchStockData(symbol, size);
   }, []);
 
   // Fetch daily stock values for selected company.
   useEffect(() => {
-	console.log('useEffect >>> selectedOutputsize selectedOutputSize >>>'+ selectedCompany + selectedOutputSize)
-    fetchStockData(selectedCompany, selectedOutputSize);
-  }, [selectedCompany, selectedOutputSize]);
+	fetchStockData(deriveCompany, dataSize);
+  }, [selectedValue]);
 
   return {
-    company,
-	selectedCompany,
+	company,
 	outputsize,
-	selectedOutputSize,
-    handleChange,
+	selectedValue,
+	handleChangeValues,
     stockData,
   };
 };
@@ -198,25 +206,28 @@ const Chart: React.FC<ChartParams> = ({symbol, size}: ChartParams): JSX.Element 
   const classes = useStyles();
   // Obtain daily stock chart for GOOGL when the component mounts
   const {
+	company,
+	outputsize,
+	selectedValue,
+	handleChangeValues,
     stockData,
-    company,
-    selectedCompany,
-    handleChange,
   } = useFormatFetchedData(symbol, size);
+
+  let {dataSize, deriveCompany} = selectedValue;
 
   return (
     <React.Fragment>
       <Grid container spacing={2}>
-        <Grid item xs={9} className={classes.root}>
+        <Grid item xs={12} className={classes.root}>
           <Paper className={classes.pageContent}>
             <FormControl className={classes.formControl}>
               <InputLabel disableAnimation={false} htmlFor="Stock">
                 Stock *
               </InputLabel>
               <Select
-                value={selectedCompany}
+                value={deriveCompany}
                 onChange={(event) => {
-                  handleChange(event);
+                  handleChangeValues(event, 'deriveCompany');
                 }}
                 input={<Input name="company" id="company" />}
               >
@@ -234,6 +245,32 @@ const Chart: React.FC<ChartParams> = ({symbol, size}: ChartParams): JSX.Element 
               <FormHelperText>Select Company</FormHelperText>
             </FormControl>
           </Paper>
+		  <Paper className={classes.pageContent}>
+            <FormControl className={classes.formControl}>
+              <InputLabel disableAnimation={false} htmlFor="Stock">
+                Size *
+              </InputLabel>
+              <Select
+                value={dataSize}
+                onChange={(event) => {
+                  handleChangeValues(event, 'dataSize');
+                }}
+                input={<Input name="size" id="size" />}
+              >
+                <MenuItem selected disabled value="">
+                  <em>Please select</em>
+                </MenuItem>
+                {outputsize.map((option) => {
+                  return (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+              <FormHelperText>Select Size</FormHelperText>
+            </FormControl>
+          </Paper>
         </Grid>
       </Grid>
       <CanvasJSChart
@@ -243,7 +280,7 @@ const Chart: React.FC<ChartParams> = ({symbol, size}: ChartParams): JSX.Element 
           theme: "dark1",
           exportEnabled: true,
           title: {
-            text: `Historical data ${selectedCompany}`,
+            text: `Historical data ${deriveCompany}`,
           },
           subtitles: [
             {

@@ -1,4 +1,4 @@
-interface StockValues {
+export interface StockValues {
   date: string;
   open: number;
   high: number;
@@ -6,42 +6,32 @@ interface StockValues {
   close: number;
 }
 
-interface ItemData {
+export interface ItemData {
   open: number;
   high: number;
   low: number;
   close: number;
 }
 
-interface FormatedStockValues {
+export interface FormatedStockValues {
   x: Date;
   y: number[];
 }
 
-interface ChartValues {
+export interface ChartValues {
   date: string;
   values: ItemData[];
 }
 
-interface ChartParams {
+export interface ChartParams {
   symbol: string;
   size: string;
 }
 
-interface ReturnedMappedValues {
+export interface ReturnedMappedValues {
   company: string[];
-  selectedCompany: string;
   outputsize: string[];
-  selectedOutputSize: string;
-  handleChange: (event: any) => void;
+  selectedValue: any;
+  handleChangeValues: (event: any, name:string) => void
   stockData: any[];
-}
-
-export {
-	StockValues,
-	ItemData,
-	FormatedStockValues,
-	ChartValues,
-	ChartParams,
-	ReturnedMappedValues
 }

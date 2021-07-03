@@ -7,11 +7,6 @@ const outputsize = 'compact';
 
 //https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=TSCO.LON&outputsize=full&apikey=demo
 
-interface ApiParams {
-    stockSymbol: String,
-    outputsize: String
-}
-
 /**
  * Fetch API call.
  * @todo check promise type return.
@@ -20,7 +15,7 @@ interface ApiParams {
  * @param {string} 
  * @return {promise<object:any>}
  */
-export const fetchStockDataForSymbol = (stockSymbol: string, outputsize: string):Promise<any> => {
-    let API_call = `https://www.alphavantage.co/query?function=${functionParams}&symbol=${stockSymbol}&interval=5min&outputsize=${outputsize}&apikey=${API_KEY}`;
+export const fetchStockDataForSymbol = (stockSymbol:String, outputsize: String):Promise<any> => {
+    let API_call = `https://www.alphavantage.co/query?function=${functionParams}&symbol=${stockSymbol}&interval=60min&outputsize=${outputsize}&apikey=${API_KEY}`;
     return fetch(API_call);
 };
