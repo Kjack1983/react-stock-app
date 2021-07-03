@@ -1,13 +1,13 @@
-import React, { useState, Dispatch, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { CanvasJSChart } from "canvasjs-react-charts";
 import { fetchStockDataForSymbol } from "./connection/ApiConnector";
 import {
-	StockValues,
-	FormatedStockValues,
-	ChartValues,
-	ChartParams,
-	ReturnedMappedValues
-} from './Validation/ValidateParams';
+  StockValues,
+  FormatedStockValues,
+  ChartValues,
+  ChartParams,
+  ReturnedMappedValues,
+} from "./Validation/ValidateParams";
 import {
   Select,
   FormHelperText,
@@ -26,6 +26,9 @@ const useStyles = makeStyles((theme) => ({
       width: "20% ",
       marginLeft: "10px",
       marginBottom: "5px",
+    },
+    "& .MuiGrid-root": {
+      width: "120px",
     },
     "& .MuiButtonBase-root": {
       marginTop: "20px",
@@ -92,34 +95,37 @@ const useStyles = makeStyles((theme) => ({
  * @param {string} symbol
  * @return {object} { stockData, setStockData }
  */
-const useFormatFetchedData = (symbol: string, size: string): ReturnedMappedValues => {
+const useFormatFetchedData = (
+  symbol: string,
+  size: string
+): ReturnedMappedValues => {
   const [company] = useState<string[]>(["GOOGL", "FB", "TWTR", "AMZN", "IBM"]);
-  const [outputsize] = useState<string[]>(['compact', 'full']);
-  
+  const [outputsize] = useState<string[]>(["compact", "full"]);
+
   // New API option values.
   const [selectedValue, setSelectedValue] = useState<any>({
-	  dataSize: 'compact',
-	  deriveCompany: 'GOOGL'
+    dataSize: "compact",
+    deriveCompany: "GOOGL",
   });
 
-  // Destructure in order to feed new API options. 
-  let {dataSize, deriveCompany} = selectedValue;
+  // Destructure in order to feed new API options.
+  let { dataSize, deriveCompany } = selectedValue;
 
   const [stockData, setStockData] = useState<StockValues[]>([]);
-  
+
   // handle options.
-  const handleChangeValues = (event:any, name: string):void => {
-	let { target } = event;
-	setSelectedValue({
-		...selectedValue,
-		[name]: target.value
-	})
-  }
+  const handleChangeValues = (event: any, name: string): void => {
+    let { target } = event;
+    setSelectedValue({
+      ...selectedValue,
+      [name]: target.value,
+    });
+  };
 
   const fetchStockData = async (symbol: string, size: string) => {
     const response = await fetchStockDataForSymbol(symbol, size);
     const result = await response.json();
-	setStockData(constructStockData(result["Time Series (Daily)"]));
+    setStockData(constructStockData(result["Time Series (Daily)"]));
   };
 
   // Fetch daily stock chart for GOOGL when the component mounts
@@ -129,14 +135,14 @@ const useFormatFetchedData = (symbol: string, size: string): ReturnedMappedValue
 
   // Fetch daily stock values for selected company.
   useEffect(() => {
-	fetchStockData(deriveCompany, dataSize);
+    fetchStockData(deriveCompany, dataSize);
   }, [selectedValue]);
 
   return {
-	company,
-	outputsize,
-	selectedValue,
-	handleChangeValues,
+    company,
+    outputsize,
+    selectedValue,
+    handleChangeValues,
     stockData,
   };
 };
@@ -202,23 +208,26 @@ const chartFormatedData = (stockData: StockValues[]): FormatedStockValues[] => {
  * @param {string} symbol
  * @return {JSX}
  */
-const Chart: React.FC<ChartParams> = ({symbol, size}: ChartParams): JSX.Element => {
+const Chart: React.FC<ChartParams> = ({
+  symbol,
+  size,
+}: ChartParams): JSX.Element => {
   const classes = useStyles();
   // Obtain daily stock chart for GOOGL when the component mounts
   const {
-	company,
-	outputsize,
-	selectedValue,
-	handleChangeValues,
+    company,
+    outputsize,
+    selectedValue,
+    handleChangeValues,
     stockData,
   } = useFormatFetchedData(symbol, size);
 
-  let {dataSize, deriveCompany} = selectedValue;
+  let { dataSize, deriveCompany } = selectedValue;
 
   return (
     <React.Fragment>
       <Grid container spacing={2}>
-        <Grid item xs={12} className={classes.root}>
+        <Grid item xs={4} className={classes.root}>
           <Paper className={classes.pageContent}>
             <FormControl className={classes.formControl}>
               <InputLabel disableAnimation={false} htmlFor="Stock">
@@ -227,7 +236,7 @@ const Chart: React.FC<ChartParams> = ({symbol, size}: ChartParams): JSX.Element 
               <Select
                 value={deriveCompany}
                 onChange={(event) => {
-                  handleChangeValues(event, 'deriveCompany');
+                  handleChangeValues(event, "deriveCompany");
                 }}
                 input={<Input name="company" id="company" />}
               >
@@ -245,7 +254,9 @@ const Chart: React.FC<ChartParams> = ({symbol, size}: ChartParams): JSX.Element 
               <FormHelperText>Select Company</FormHelperText>
             </FormControl>
           </Paper>
-		  <Paper className={classes.pageContent}>
+        </Grid>
+        <Grid item xs={4} className={classes.root}>
+          <Paper className={classes.pageContent}>
             <FormControl className={classes.formControl}>
               <InputLabel disableAnimation={false} htmlFor="Stock">
                 Size *
@@ -253,7 +264,7 @@ const Chart: React.FC<ChartParams> = ({symbol, size}: ChartParams): JSX.Element 
               <Select
                 value={dataSize}
                 onChange={(event) => {
-                  handleChangeValues(event, 'dataSize');
+                  handleChangeValues(event, "dataSize");
                 }}
                 input={<Input name="size" id="size" />}
               >
@@ -276,6 +287,7 @@ const Chart: React.FC<ChartParams> = ({symbol, size}: ChartParams): JSX.Element 
       <CanvasJSChart
         options={{
           animationEnabled: true,
+          zoomEnabled: true,
           // "light1", "light2", "dark1", "dark2"
           theme: "dark1",
           exportEnabled: true,
@@ -332,8 +344,7 @@ const Chart: React.FC<ChartParams> = ({symbol, size}: ChartParams): JSX.Element 
 
                   // Difference between the current and previous data points
                   // In milliseconds
-                  const difference =
-                    previousDataPointUnix - currentDataPointUnix;
+                  const difference = previousDataPointUnix - currentDataPointUnix;
 
                   // Difference equals 1 day, then no scale pointValues is needed otherwise create one.
                   return difference === oneDayInMs
