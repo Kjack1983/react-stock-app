@@ -132,7 +132,7 @@ const ChartSelect: React.FC<selectorProps> = ({
 					<FormHelperText>Select Company</FormHelperText>
 				</FormControl>
 			</Paper>
-        </Grid>
+		</Grid>
 	)
 };
 

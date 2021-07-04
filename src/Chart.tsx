@@ -1,13 +1,13 @@
 import React from "react";
 import { CanvasJSChart } from "canvasjs-react-charts";
 import {
-	StockValues,
-	FormatedStockValues,
-	ChartParams
+  StockValues,
+  FormatedStockValues,
+  ChartParams,
 } from "./Validation/ValidateParams";
 import { Grid } from "@material-ui/core";
-import * as helpers from './Helpers/HelperMethods';
-import ChartSelect from './Components/ChartSelect';
+import * as helpers from "./Helpers/HelperMethods";
+import ChartSelect from "./Components/ChartSelect";
 
 /**
  * Return stock value data.
@@ -17,17 +17,19 @@ import ChartSelect from './Components/ChartSelect';
  * @[todo] check FormatedStockValues interface.
  * @return {object<FormatedStockValues>}
  */
-export const chartFormatedData = (stockData: StockValues[]): FormatedStockValues[] => {
-	return Array.isArray(stockData) && stockData.length
-	  ? stockData.map((stockValue) => {
-		  let { date, open, high, low, close } = stockValue;
-		  return {
-			x: new Date(date),
-			y: [open, high, low, close],
-		  };
-		})
-	  : [];
-  };
+export const chartFormatedData = (
+  stockData: StockValues[]
+): FormatedStockValues[] => {
+  return Array.isArray(stockData) && stockData.length
+    ? stockData.map((stockValue) => {
+        let { date, open, high, low, close } = stockValue;
+        return {
+          x: new Date(date),
+          y: [open, high, low, close],
+        };
+      })
+    : [];
+};
 
 /**
  * Chart component display candlesticks using canvas js.
@@ -40,9 +42,8 @@ const Chart: React.FC<ChartParams> = ({
   symbol,
   size,
 }: ChartParams): JSX.Element => {
-
   // destructure helper methods.
-  let {useFormatFetchedData, toggleDataSeries} = helpers; 
+  let { useFormatFetchedData, toggleDataSeries } = helpers;
 
   const {
     company,
@@ -56,25 +57,25 @@ const Chart: React.FC<ChartParams> = ({
 
   return (
     <React.Fragment>
-		<Grid container spacing={2}>
-			<ChartSelect
-				width={4}
-				title="Company"
-				value={deriveCompany}
-				onChangeCompany={(event) => {
-					handleChangeValues(event, "deriveCompany");
-				}}
-				inputSelect={company}
-			/>
-			<ChartSelect
-				width={4}
-				title="Company"
-				value={dataSize}
-				onChangeCompany={(event) => {
-					handleChangeValues(event, "dataSize");
-				}}
-				inputSelect={outputsize}
-			/>
+      <Grid container spacing={2}>
+        <ChartSelect
+          width={4}
+          title="Company"
+          value={deriveCompany}
+          onChangeCompany={(event) => {
+            handleChangeValues(event, "deriveCompany");
+          }}
+          inputSelect={company}
+        />
+        <ChartSelect
+          width={4}
+          title="Company"
+          value={dataSize}
+          onChangeCompany={(event) => {
+            handleChangeValues(event, "dataSize");
+          }}
+          inputSelect={outputsize}
+        />
       </Grid>
       <CanvasJSChart
         options={{
