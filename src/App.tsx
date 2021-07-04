@@ -14,10 +14,7 @@ const AppContainer = styled.div`
 const App: React.FC = ():JSX.Element => {
     return (
         <AppContainer>
-            <Chart 
-                symbol = "GOOGL"
-                size = "compact" 
-            />
+            <Chart symbol = "GOOGL"size = "compact" />
         </AppContainer>
     );
 };
