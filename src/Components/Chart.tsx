@@ -4,10 +4,10 @@ import {
   StockValues,
   FormatedStockValues,
   ChartParams,
-} from "./Validation/ValidateParams";
+} from "../Validation/ValidateParams";
 import { Grid } from "@material-ui/core";
-import * as helpers from "./Helpers/HelperMethods";
-import ChartSelect from "./Components/ChartSelect";
+import * as helpers from "../Helpers/HelperMethods";
+import ChartSelect from "./ChartSelect";
 
 /**
  * Return stock value data.

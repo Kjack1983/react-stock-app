@@ -1,6 +1,5 @@
 const API_KEY = '7JNPD524Q2J2LEYG';
 const functionParams = 'TIME_SERIES_DAILY_ADJUSTED';
-const outputsize = 'compact';
 
 /**
  * Fetch API call.

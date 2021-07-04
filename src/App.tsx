@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Chart from './Chart';
+import Chart from './Components/Chart';
 import { hot } from 'react-hot-loader';
 
 const AppContainer = styled.div`
