@@ -55,6 +55,8 @@ const Chart: React.FC<ChartParams> = ({
 
   let { dataSize, deriveCompany } = selectedValue;
 
+  console.log(React.version);
+
   return (
     <React.Fragment>
       <Grid container spacing={2}>
@@ -120,8 +122,7 @@ const Chart: React.FC<ChartParams> = ({
               spacing: 0,
               fillOpacity: 0,
               lineThickness: 0,
-              customBreaks: stockData.reduce(
-                (pointValues, candle, index, array) => {
+              customBreaks: stockData.reduce((pointValues, candle, index, array) => {
                   // Just return on the first iteration
                   // Since there is no previous data point
                   if (index === 0) return pointValues;
@@ -150,8 +151,7 @@ const Chart: React.FC<ChartParams> = ({
                           endValue: previousDataPointUnix - oneDayInMs,
                         },
                       ];
-                },
-                []
+                },[]
               ),
             },
           },
