@@ -31,6 +31,7 @@ const chartFormatedData = (
 };
 
 /**
+ * Format stock API data for line display.
  * 
  * @param {StockValues[]} stockData 
  */
