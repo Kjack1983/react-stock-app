@@ -1,13 +1,14 @@
-import React from "react";
+import * as React from "react";
 import { CanvasJSChart } from "canvasjs-react-charts";
 import {
   StockValues,
   FormatedStockValues,
   ChartParams,
 } from "../Validation/ValidateParams";
-import { Grid } from "@material-ui/core";
+import { Grid, Button } from "@material-ui/core";
 import * as helpers from "../Helpers/HelperMethods";
 import ChartSelect from "./ChartSelect";
+import { useTheme, Theme } from '../Context/ThemeContext';
 
 /**
  * Return stock value data.
@@ -31,6 +32,54 @@ export const chartFormatedData = (
     : [];
 };
 
+const changeSelectedDataPoints = (e: any): void => {
+  console.log(e.chart.options.data);
+  /* let data = e.chart.options.data;
+  if (!e.chart.options.axisX)
+    e.chart.options.axisX = {};
+
+  let axisX = e.axisX[0];
+
+  for (let i = 0; i < data.length; i++) {
+    let dataPoints = data[i].dataPoints;
+    let selectedMarkerSize = data[i].selectedMarkerSize;
+    for (var j = 0; j < dataPoints.length; j++) {
+      if (dataPoints[j].x > axisX.viewportMinimum && dataPoints[j].x < axisX.viewportMaximum) {
+        if (typeof dataPoints[j].originalMarkerSize === "undefined")
+          dataPoints[j].originalMarkerSize = dataPoints[j].markerSize ? dataPoints[j].markerSize : null;
+          dataPoints[j].markerSize = selectedMarkerSize;
+      } else
+        dataPoints[j].markerSize = dataPoints[j].originalMarkerSize;
+    }
+  }
+
+  e.chart.options.axisX.viewportMinimum = e.chart.options.axisX.viewportMaximum = null; */
+};
+
+/**
+ * Custom hook to Handle chart theme
+ * 
+ * @return {void}
+ */
+const useSwitchThemeHandler = () => {
+	const { theme, setTheme } = useTheme();
+	const [alter, setAlter] = React.useState<boolean>(false);
+
+	const toogleAlter = ():void => {
+		setAlter(alter => !alter);
+		if(alter) {
+			setTheme(Theme.Light);
+		} else {
+			setTheme(Theme.Dark);
+		}
+	}
+
+	return {
+		theme,
+		toogleAlter
+	}
+}
+
 /**
  * Chart component display candlesticks using canvas js.
  *
@@ -41,6 +90,8 @@ export const chartFormatedData = (
 const Chart: React.FC<ChartParams> = ({
   symbol,
   size,
+  format,
+  time
 }: ChartParams): JSX.Element => {
   // destructure helper methods.
   let { useFormatFetchedData, toggleDataSeries } = helpers;
@@ -48,45 +99,74 @@ const Chart: React.FC<ChartParams> = ({
   const {
     company,
     outputsize,
+	dayAdjOrIntraday,
+	timeAdjustment,
     selectedValue,
     handleChangeValues,
     stockData,
-  } = useFormatFetchedData(symbol, size);
+  } = useFormatFetchedData(symbol, size, format, time);
 
-  let { dataSize, deriveCompany } = selectedValue;
+  let { theme, toogleAlter } = useSwitchThemeHandler();
+
+  let { dataSize, deriveCompany, dailyAdjustOrIntraday, displayTime } = selectedValue;
 
   return (
     <React.Fragment>
-      <Grid container spacing={2}>
+	  <Grid container spacing={2}>
         <ChartSelect
           width={4}
-          title="Company"
+		  title="company"
+		  category="deriveCompany"
           value={deriveCompany}
-          onChangeCompany={(event) => {
+          onChangeValue={(event) => {
             handleChangeValues(event, "deriveCompany");
           }}
           inputSelect={company}
         />
         <ChartSelect
           width={4}
-          title="Company"
+		  title="size"
+		  category="dataSize"
           value={dataSize}
-          onChangeCompany={(event) => {
+          onChangeValue={(event) => {
             handleChangeValues(event, "dataSize");
           }}
           inputSelect={outputsize}
         />
+        <ChartSelect
+          width={4}
+		  title="format"
+		  category="dailyAdjustOrIntraday"
+          value={dailyAdjustOrIntraday}
+          onChangeValue={(event) => {
+            handleChangeValues(event, "dailyAdjustOrIntraday");
+          }}
+          inputSelect={dayAdjOrIntraday}
+        />
+		<ChartSelect
+          width={4}
+		  title="format"
+		  category="displayTime"
+          value={displayTime}
+          onChangeValue={(event) => {
+            handleChangeValues(event, "displayTime");
+          }}
+          inputSelect={timeAdjustment}
+        />
+		<Button onClick={toogleAlter} variant="contained" color="primary">
+			switch to dark theme
+		</Button>
       </Grid>
       <CanvasJSChart
         options={{
           animationEnabled: true,
           zoomEnabled: true,
-          // "light1", "light2", "dark1", "dark2"
-          theme: "dark1",
+          theme: theme,
           exportEnabled: true,
           title: {
             text: `Historical data ${deriveCompany}`,
           },
+          /* rangeChanging: changeSelectedDataPoints, */
           subtitles: [
             {
               text: "Weekly Averages",
@@ -149,7 +229,8 @@ const Chart: React.FC<ChartParams> = ({
                           endValue: previousDataPointUnix - oneDayInMs,
                         },
                       ];
-                },[]
+                },
+                []
               ),
             },
           },

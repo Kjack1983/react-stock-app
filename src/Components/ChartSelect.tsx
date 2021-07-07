@@ -14,12 +14,13 @@ import {
 const useStyles = makeStyles((theme) => ({
 	root: {
 		"& .MuiFormControl-root": {
-			width: "20% ",
+			width: "90% !important",
 			marginLeft: "10px",
 			marginBottom: "5px",
 		},
 		"& .MuiGrid-root": {
 			width: "120px",
+			marginBottom: '20px !important'
 		},
 		"& .MuiButtonBase-root": {
 			marginTop: "20px",
@@ -83,8 +84,9 @@ const useStyles = makeStyles((theme) => ({
 type selectorProps = {
 	width: number;
 	title: string;
+	category: string;
 	value: string;
-	onChangeCompany: (event:any, company: string) => void;
+	onChangeValue: (event:any, value: string) => void;
 	inputSelect: any
 }
 
@@ -98,14 +100,15 @@ type selectorProps = {
 const ChartSelect: React.FC<selectorProps> = ({
 	width,
 	title,
+	category,
 	value,
-	onChangeCompany,
+	onChangeValue,
 	inputSelect
 }: selectorProps): JSX.Element => {
 	const classes = useStyles();
 
 	return (
-		<Grid item xs={4} className={classes.root}>
+		<Grid item xs={2} className={classes.root}>
 			<Paper className={classes.pageContent}>
 				<FormControl className={classes.formControl}>
 						<InputLabel disableAnimation={false} htmlFor="Stock">
@@ -114,9 +117,9 @@ const ChartSelect: React.FC<selectorProps> = ({
 						<Select
 							value={value}
 							onChange={(event) => {
-								onChangeCompany(event, "deriveCompany");
+								onChangeValue(event, category);
 							}}
-							input={<Input name="company" id="company" />}
+							input={<Input name={title} id={"#"+title} />}
 						>
 							<MenuItem selected disabled value="">
 								<em>Please select</em>
@@ -129,7 +132,7 @@ const ChartSelect: React.FC<selectorProps> = ({
 								);
 							})}
 						</Select>
-					<FormHelperText>Select Company</FormHelperText>
+						<FormHelperText>Select {title}</FormHelperText>
 				</FormControl>
 			</Paper>
 		</Grid>

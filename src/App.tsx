@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import styled from 'styled-components';
+import { ThemeContext, Theme } from './Context/ThemeContext';
 import Chart from './Components/Chart';
 import { hot } from 'react-hot-loader';
 
@@ -12,10 +13,19 @@ const AppContainer = styled.div`
 `;
 
 const App: React.FC = ():JSX.Element => {
+    const [theme, setTheme] = useState(Theme.Light);
+
     return (
-        <AppContainer>
-            <Chart symbol = "GOOGL"size = "compact" />
-        </AppContainer>
+        <ThemeContext.Provider value={{ theme, setTheme }}>
+            <AppContainer>
+                <Chart 
+                    symbol="GOOGL" 
+                    size="compact" 
+                    format="TIME_SERIES_DAILY_ADJUSTED"
+                    time="5min"
+                />
+            </AppContainer>
+        </ThemeContext.Provider>
     );
 };
 

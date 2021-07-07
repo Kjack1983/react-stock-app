@@ -26,11 +26,15 @@ export interface ChartValues {
 export interface ChartParams {
   symbol: string;
   size: string;
+  format: string
+  time: string
 }
 
 export interface ReturnedMappedValues {
   company: string[];
   outputsize: string[];
+  dayAdjOrIntraday: string[];
+  timeAdjustment: string[];
   selectedValue: any;
   handleChangeValues: (event: any, name:string) => void
   stockData: any[];
