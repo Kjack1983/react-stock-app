@@ -1,0 +1,13 @@
+import * as React from 'react';
+import { shallow } from 'enzyme';
+import Chart from './Chart';
+
+describe('Chart component', () => {
+    const chart = shallow(<Chart symbol="" size=""/>);
+
+    // Interaction demo
+    expect(chart.prop('symbol').to.be.a('number'));
+    expect(chart.prop('size').to.be.a('string'));
+    expect(chart).toMatchSnapshot();
+
+})

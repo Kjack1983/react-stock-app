@@ -55,8 +55,6 @@ const Chart: React.FC<ChartParams> = ({
 
   let { dataSize, deriveCompany } = selectedValue;
 
-  console.log(React.version);
-
   return (
     <React.Fragment>
       <Grid container spacing={2}>
