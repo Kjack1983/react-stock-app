@@ -8,17 +8,15 @@ import {
 import { Grid, Button } from "@material-ui/core";
 import * as helpers from "../Helpers/HelperMethods";
 import ChartSelect from "./ChartSelect";
-import { useTheme, Theme } from '../Context/ThemeContext';
+import { useTheme, Theme } from "../Context/ThemeContext";
 
 /**
  * Return stock value data.
  *
- * @param stockData
- *
- * @[todo] check FormatedStockValues interface.
+ * @param {StockValues[]} stockData 
  * @return {object<FormatedStockValues>}
  */
-export const chartFormatedData = (
+const chartFormatedData = (
   stockData: StockValues[]
 ): FormatedStockValues[] => {
   return Array.isArray(stockData) && stockData.length
@@ -32,53 +30,44 @@ export const chartFormatedData = (
     : [];
 };
 
-const changeSelectedDataPoints = (e: any): void => {
-  console.log(e.chart.options.data);
-  /* let data = e.chart.options.data;
-  if (!e.chart.options.axisX)
-    e.chart.options.axisX = {};
-
-  let axisX = e.axisX[0];
-
-  for (let i = 0; i < data.length; i++) {
-    let dataPoints = data[i].dataPoints;
-    let selectedMarkerSize = data[i].selectedMarkerSize;
-    for (var j = 0; j < dataPoints.length; j++) {
-      if (dataPoints[j].x > axisX.viewportMinimum && dataPoints[j].x < axisX.viewportMaximum) {
-        if (typeof dataPoints[j].originalMarkerSize === "undefined")
-          dataPoints[j].originalMarkerSize = dataPoints[j].markerSize ? dataPoints[j].markerSize : null;
-          dataPoints[j].markerSize = selectedMarkerSize;
-      } else
-        dataPoints[j].markerSize = dataPoints[j].originalMarkerSize;
-    }
-  }
-
-  e.chart.options.axisX.viewportMinimum = e.chart.options.axisX.viewportMaximum = null; */
-};
+/**
+ * 
+ * @param {StockValues[]} stockData 
+ */
+const chartFormatedDataLine = (stockData: StockValues[]) => {
+  return Array.isArray(stockData) && stockData.length
+    ? stockData.map(({ date, close }) => {
+      return {
+        x: new Date(date),
+        y: close,
+      };
+    })
+  : [];
+}
 
 /**
  * Custom hook to Handle chart theme
- * 
+ *
  * @return {void}
  */
-const useSwitchThemeHandler = () => {
-	const { theme, setTheme } = useTheme();
-	const [alter, setAlter] = React.useState<boolean>(false);
+const useSwitchThemeHandler = ():any => {
+  const { theme, setTheme } = useTheme();
+  const [alter, setAlter] = React.useState<boolean>(false);
 
-	const toogleAlter = ():void => {
-		setAlter(alter => !alter);
-		if(alter) {
-			setTheme(Theme.Light);
-		} else {
-			setTheme(Theme.Dark);
-		}
-	}
+  const toogleAlter = (): void => {
+    setAlter((alter) => !alter);
+    if (alter) {
+      setTheme(Theme.Light);
+    } else {
+      setTheme(Theme.Dark);
+    }
+  };
 
-	return {
-		theme,
-		toogleAlter
-	}
-}
+  return {
+    theme,
+    toogleAlter,
+  };
+};
 
 /**
  * Chart component display candlesticks using canvas js.
@@ -91,7 +80,7 @@ const Chart: React.FC<ChartParams> = ({
   symbol,
   size,
   format,
-  time
+  time,
 }: ChartParams): JSX.Element => {
   // destructure helper methods.
   let { useFormatFetchedData, toggleDataSeries } = helpers;
@@ -99,8 +88,8 @@ const Chart: React.FC<ChartParams> = ({
   const {
     company,
     outputsize,
-	dayAdjOrIntraday,
-	timeAdjustment,
+    dayAdjOrIntraday,
+    timeAdjustment,
     selectedValue,
     handleChangeValues,
     stockData,
@@ -108,15 +97,20 @@ const Chart: React.FC<ChartParams> = ({
 
   let { theme, toogleAlter } = useSwitchThemeHandler();
 
-  let { dataSize, deriveCompany, dailyAdjustOrIntraday, displayTime } = selectedValue;
+  let {
+    dataSize,
+    deriveCompany,
+    dailyAdjustOrIntraday,
+    displayTime,
+  } = selectedValue;
 
   return (
     <React.Fragment>
-	  <Grid container spacing={2}>
+      <Grid container spacing={2}>
         <ChartSelect
           width={4}
-		  title="company"
-		  category="deriveCompany"
+          title="company"
+          category="deriveCompany"
           value={deriveCompany}
           onChangeValue={(event) => {
             handleChangeValues(event, "deriveCompany");
@@ -125,8 +119,8 @@ const Chart: React.FC<ChartParams> = ({
         />
         <ChartSelect
           width={4}
-		  title="size"
-		  category="dataSize"
+          title="size"
+          category="dataSize"
           value={dataSize}
           onChangeValue={(event) => {
             handleChangeValues(event, "dataSize");
@@ -135,27 +129,27 @@ const Chart: React.FC<ChartParams> = ({
         />
         <ChartSelect
           width={4}
-		  title="format"
-		  category="dailyAdjustOrIntraday"
+          title="format"
+          category="dailyAdjustOrIntraday"
           value={dailyAdjustOrIntraday}
           onChangeValue={(event) => {
             handleChangeValues(event, "dailyAdjustOrIntraday");
           }}
           inputSelect={dayAdjOrIntraday}
         />
-		<ChartSelect
+        <ChartSelect
           width={4}
-		  title="format"
-		  category="displayTime"
+          title="format"
+          category="displayTime"
           value={displayTime}
           onChangeValue={(event) => {
             handleChangeValues(event, "displayTime");
           }}
           inputSelect={timeAdjustment}
         />
-		<Button onClick={toogleAlter} variant="contained" color="primary">
-			switch to dark theme
-		</Button>
+        <Button onClick={toogleAlter} variant="outlined" color="primary">
+          switch to dark theme
+        </Button>
       </Grid>
       <CanvasJSChart
         options={{
@@ -166,20 +160,11 @@ const Chart: React.FC<ChartParams> = ({
           title: {
             text: `Historical data ${deriveCompany}`,
           },
-          /* rangeChanging: changeSelectedDataPoints, */
           subtitles: [
             {
               text: "Weekly Averages",
             },
           ],
-          toolTip: {
-            shared: true,
-          },
-          legend: {
-            reversed: true,
-            cursor: "pointer",
-            itemclick: toggleDataSeries,
-          },
           axisY: {
             prefix: "$",
             // Minimum value is 10% less than the lowest price in the dataset
@@ -200,28 +185,22 @@ const Chart: React.FC<ChartParams> = ({
               spacing: 0,
               fillOpacity: 0,
               lineThickness: 0,
-              customBreaks: stockData.reduce((pointValues, candle, index, array) => {
-                  // Just return on the first iteration
-                  // Since there is no previous data point
+              customBreaks: stockData.reduce((pointValues, candleLine, index, array) => {
+                  // return on the first iteration since there is no previous data point
                   if (index === 0) return pointValues;
 
                   // Time in UNIX for current and previous data points
-                  const currentDataPointUnix = Number(new Date(candle.date));
-                  const previousDataPointUnix = Number(
-                    new Date(array[index - 1].date)
-                  );
+                  const currentDataPointUnix = Number(new Date(candleLine.date));
+                  const previousDataPointUnix = Number(new Date(array[index - 1].date));
 
                   // One day converted to milliseconds
                   const oneDayInMs = 86400000;
 
-                  // Difference between the current and previous data points
-                  // In milliseconds
-                  const difference =
-                    previousDataPointUnix - currentDataPointUnix;
+                  // Difference between the current and previous data points In milliseconds
+                  const difference = previousDataPointUnix - currentDataPointUnix;
 
                   // Difference equals 1 day, then no scale pointValues is needed otherwise create one.
-                  return difference === oneDayInMs
-                    ? pointValues
+                  return difference === oneDayInMs ? pointValues
                     : [
                         ...pointValues,
                         {
@@ -229,9 +208,7 @@ const Chart: React.FC<ChartParams> = ({
                           endValue: previousDataPointUnix - oneDayInMs,
                         },
                       ];
-                },
-                []
-              ),
+                  }, []),
             },
           },
           axisY2: {
@@ -239,6 +216,14 @@ const Chart: React.FC<ChartParams> = ({
             suffix: "bn",
             title: "Revenue & Income",
             tickLength: 0,
+          },
+          toolTip: {
+            shared: true,
+          },
+          legend: {
+            reversed: true,
+            cursor: "pointer",
+            itemclick: toggleDataSeries,
           },
           data: [
             {
@@ -256,7 +241,7 @@ const Chart: React.FC<ChartParams> = ({
               axisYType: "secondary",
               yValueFormatString: "$#,##0.00bn",
               xValueFormatString: "MMMM",
-              dataPoints: chartFormatedData(stockData),
+              dataPoints: chartFormatedDataLine(stockData),
             },
           ],
         }}

@@ -79,8 +79,8 @@ const useFormatFetchedData = (
 		let { target } = event;
 		
 		setSelectedValue({
-		...selectedValue,
-		[name]: target.value,
+			...selectedValue,
+			[name]: target.value,
 		});
 	};
 
@@ -104,7 +104,7 @@ const useFormatFetchedData = (
 	// Fetch daily stock values for selected company.
 	useEffect(() => {
 		fetchStockData(deriveCompany, dataSize, dailyAdjustOrIntraday, displayTime);
-	}, [selectedValue]);
+	}, [deriveCompany, dataSize, dailyAdjustOrIntraday, displayTime]);
 
 	return {
 		company,
