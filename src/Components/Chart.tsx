@@ -222,8 +222,7 @@ const Chart: React.FC<ChartParams> = ({
               spacing: 0,
               fillOpacity: 0,
               lineThickness: 0,
-              customBreaks: stockData.reduce(
-                (pointValues, candleLine, index, array) => {
+              customBreaks: stockData.reduce((pointValues, candleLine, index, array) => {
                   // return on the first iteration since there is no previous data point
                   if (index === 0) return pointValues;
 
@@ -246,8 +245,7 @@ const Chart: React.FC<ChartParams> = ({
                           endValue: previousDataPointUnix - oneDayInMs,
                         },
                       ];
-                },
-                []
+                  },[]
               ),
             },
           },
