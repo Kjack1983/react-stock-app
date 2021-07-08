@@ -65,7 +65,10 @@ const chartFormatedData = (stockData: StockValues[]): FormatedStockValues[] => {
 const chartFormatedDataLine = (stockData): stockPropsLine => {
   return (
     Array.isArray(stockData) && stockData.length && stockData.reduce((acc, { date, close }) => {
-      return [...acc, { x: new Date(date), y: close }];
+      return [
+        ...acc, 
+        { x: new Date(date), y: close }
+      ];
     }, [])
   );
 };
