@@ -5,7 +5,7 @@ import {
   FormatedStockValues,
   ChartParams,
   stockPropsLine,
-  ReturnHookValueCheck
+  ReturnHookValueCheck,
 } from "../Validation/ValidateParams";
 import { Grid, Button, makeStyles } from "@material-ui/core";
 import * as helpers from "../Helpers/HelperMethods";
@@ -13,43 +13,40 @@ import ChartSelect from "./ChartSelect";
 import { useTheme, Theme } from "../Context/ThemeContext";
 
 const useStyles = makeStyles((theme) => ({
-	root: {
-		"& .MuiGrid-root": {
-      marginBottom: "20px"
-		},
+  root: {
+    "& .MuiGrid-root": {
+      marginBottom: "20px",
+    },
   },
   button: {
-    color: '#58575d',
-    border: '1px solid rgba(155, 156, 162, 0.5)',
-    backgroundColor: '#d7d6da',
-    maxHeight: '118px',
-    '&:hover': {
-      border: '1px solid rgba(210, 211, 216, 0.5)',
-    }
-	},
-	formControl: {
-		width: "15% !important",
-		"& label span": {
-			color: "red",
-		},
-		paddingRight: "25px"
-	},
-	pageContent: {
-		padding: theme.spacing(1),
-	},
+    color: "#58575d",
+    border: "1px solid rgba(155, 156, 162, 0.5)",
+    backgroundColor: "#d7d6da",
+    maxHeight: "118px",
+    "&:hover": {
+      border: "1px solid rgba(210, 211, 216, 0.5)",
+    },
+  },
+  formControl: {
+    width: "15% !important",
+    "& label span": {
+      color: "red",
+    },
+    paddingRight: "25px",
+  },
+  pageContent: {
+    padding: theme.spacing(1),
+  },
 }));
 
 /**
  * Return stock value data.
  *
- * @param {StockValues[]} stockData 
+ * @param {StockValues[]} stockData
  * @return {Array<FormatedStockValues>}
  */
-const chartFormatedData = (
-  stockData: StockValues[]
-): FormatedStockValues[] => {
-  return Array.isArray(stockData) && stockData.length
-    ? stockData.map((stockValue) => {
+const chartFormatedData = (stockData: StockValues[]): FormatedStockValues[] => {
+  return Array.isArray(stockData) && stockData.length ? stockData.map((stockValue) => {
         let { date, open, high, low, close } = stockValue;
         return {
           x: new Date(date),
@@ -59,48 +56,46 @@ const chartFormatedData = (
     : [];
 };
 
-
 /**
  * Format stock API data for line display.
- * 
+ *
  * @param {array} stockData
- * @return {array<stockPropsLine>} stockData 
+ * @return {array<stockPropsLine>} stockData
  */
 const chartFormatedDataLine = (stockData): stockPropsLine => {
-  return Array.isArray(stockData) && stockData.length && stockData.reduce((acc, {date, close}) => {
-      return [
-        ...acc, 
-        { x: new Date(date), y: close }
-      ]
-    }, []);
-}
+  return (
+    Array.isArray(stockData) && stockData.length && stockData.reduce((acc, { date, close }) => {
+      return [...acc, { x: new Date(date), y: close }];
+    }, [])
+  );
+};
 
 /**
- * Custom hook to Handle chart theme 
+ * Custom hook to Handle chart theme
  * color / button text ammendments.
  *
  * @return {void}
  */
-const useSwitchThemeHandler = ():ReturnHookValueCheck => {
+const useSwitchThemeHandler = (): ReturnHookValueCheck => {
   const { theme, setTheme } = useTheme();
   const [alter, setAlter] = React.useState<boolean>(false);
-  const [switchText, setSwitchText] = React.useState<string>('Switch to White');
+  const [switchText, setSwitchText] = React.useState<string>("Switch to White");
 
   const toogleAlter = (): void => {
     setAlter((alter) => !alter);
     if (alter) {
       setTheme(Theme.Light);
-      setSwitchText('Switch to White');
+      setSwitchText("Switch to White");
     } else {
       setTheme(Theme.Dark);
-      setSwitchText('Switch to Dark');
+      setSwitchText("Switch to Dark");
     }
   };
 
   return {
     theme,
     toogleAlter,
-    switchText
+    switchText,
   };
 };
 
@@ -184,7 +179,12 @@ const Chart: React.FC<ChartParams> = ({
           }}
           inputSelect={timeAdjustment}
         />
-        <Button onClick={toogleAlter} variant="outlined" color="primary" className={classes.button}>
+        <Button
+          onClick={toogleAlter}
+          variant="outlined"
+          color="primary"
+          className={classes.button}
+        >
           {switchText}
         </Button>
       </Grid>
@@ -222,7 +222,8 @@ const Chart: React.FC<ChartParams> = ({
               spacing: 0,
               fillOpacity: 0,
               lineThickness: 0,
-              customBreaks: stockData.reduce((pointValues, candleLine, index, array) => {
+              customBreaks: stockData.reduce(
+                (pointValues, candleLine, index, array) => {
                   // return on the first iteration since there is no previous data point
                   if (index === 0) return pointValues;
 
@@ -245,7 +246,9 @@ const Chart: React.FC<ChartParams> = ({
                           endValue: previousDataPointUnix - oneDayInMs,
                         },
                       ];
-                  }, []),
+                },
+                []
+              ),
             },
           },
           axisY2: {
