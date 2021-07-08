@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
 		"& .MuiFormControl-root": {
 			width: "90% !important",
 			marginLeft: "10px",
-			marginBottom: "5px",
+			marginBottom: "20px",
 		},
 		"& .MuiGrid-root": {
 			width: "120px",
@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
 		"& label span": {
 			color: "red",
 		},
-		paddingRight: "25px",
+		paddingRight: "25px"
 	},
 	pageContent: {
 		padding: theme.spacing(1),
@@ -112,7 +112,7 @@ const ChartSelect: React.FC<selectorProps> = ({
 			<Paper className={classes.pageContent}>
 				<FormControl className={classes.formControl}>
 						<InputLabel disableAnimation={false} htmlFor="Stock">
-							Stock *
+							{title} *
 						</InputLabel>
 						<Select
 							value={value}

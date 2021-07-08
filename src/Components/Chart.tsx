@@ -4,17 +4,46 @@ import {
   StockValues,
   FormatedStockValues,
   ChartParams,
+  stockPropsLine,
+  ReturnHookValueCheck
 } from "../Validation/ValidateParams";
-import { Grid, Button } from "@material-ui/core";
+import { Grid, Button, makeStyles } from "@material-ui/core";
 import * as helpers from "../Helpers/HelperMethods";
 import ChartSelect from "./ChartSelect";
 import { useTheme, Theme } from "../Context/ThemeContext";
+
+const useStyles = makeStyles((theme) => ({
+	root: {
+		"& .MuiGrid-root": {
+      marginBottom: "20px"
+		},
+  },
+  button: {
+    color: '#58575d',
+    border: '1px solid rgba(155, 156, 162, 0.5)',
+    backgroundColor: '#d7d6da',
+    maxHeight: '118px',
+    '&:hover': {
+      border: '1px solid rgba(210, 211, 216, 0.5)',
+    }
+	},
+	formControl: {
+		width: "15% !important",
+		"& label span": {
+			color: "red",
+		},
+		paddingRight: "25px"
+	},
+	pageContent: {
+		padding: theme.spacing(1),
+	},
+}));
 
 /**
  * Return stock value data.
  *
  * @param {StockValues[]} stockData 
- * @return {object<FormatedStockValues>}
+ * @return {Array<FormatedStockValues>}
  */
 const chartFormatedData = (
   stockData: StockValues[]
@@ -30,43 +59,48 @@ const chartFormatedData = (
     : [];
 };
 
+
 /**
  * Format stock API data for line display.
  * 
- * @param {StockValues[]} stockData 
+ * @param {array} stockData
+ * @return {array<stockPropsLine>} stockData 
  */
-const chartFormatedDataLine = (stockData: StockValues[]) => {
-  return Array.isArray(stockData) && stockData.length
-    ? stockData.map(({ date, close }) => {
-      return {
-        x: new Date(date),
-        y: close,
-      };
-    })
-  : [];
+const chartFormatedDataLine = (stockData): stockPropsLine => {
+  return Array.isArray(stockData) && stockData.length && stockData.reduce((acc, {date, close}) => {
+      return [
+        ...acc, 
+        { x: new Date(date), y: close }
+      ]
+    }, []);
 }
 
 /**
- * Custom hook to Handle chart theme
+ * Custom hook to Handle chart theme 
+ * color / button text ammendments.
  *
  * @return {void}
  */
-const useSwitchThemeHandler = ():any => {
+const useSwitchThemeHandler = ():ReturnHookValueCheck => {
   const { theme, setTheme } = useTheme();
   const [alter, setAlter] = React.useState<boolean>(false);
+  const [switchText, setSwitchText] = React.useState<string>('Switch to White');
 
   const toogleAlter = (): void => {
     setAlter((alter) => !alter);
     if (alter) {
       setTheme(Theme.Light);
+      setSwitchText('Switch to White');
     } else {
       setTheme(Theme.Dark);
+      setSwitchText('Switch to Dark');
     }
   };
 
   return {
     theme,
     toogleAlter,
+    switchText
   };
 };
 
@@ -83,6 +117,8 @@ const Chart: React.FC<ChartParams> = ({
   format,
   time,
 }: ChartParams): JSX.Element => {
+  const classes = useStyles();
+
   // destructure helper methods.
   let { useFormatFetchedData, toggleDataSeries } = helpers;
 
@@ -96,7 +132,7 @@ const Chart: React.FC<ChartParams> = ({
     stockData,
   } = useFormatFetchedData(symbol, size, format, time);
 
-  let { theme, toogleAlter } = useSwitchThemeHandler();
+  let { theme, toogleAlter, switchText } = useSwitchThemeHandler();
 
   let {
     dataSize,
@@ -107,7 +143,7 @@ const Chart: React.FC<ChartParams> = ({
 
   return (
     <React.Fragment>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} className={classes.root}>
         <ChartSelect
           width={4}
           title="company"
@@ -148,8 +184,8 @@ const Chart: React.FC<ChartParams> = ({
           }}
           inputSelect={timeAdjustment}
         />
-        <Button onClick={toogleAlter} variant="outlined" color="primary">
-          switch to dark theme
+        <Button onClick={toogleAlter} variant="outlined" color="primary" className={classes.button}>
+          {switchText}
         </Button>
       </Grid>
       <CanvasJSChart
@@ -201,8 +237,8 @@ const Chart: React.FC<ChartParams> = ({
                   const difference = previousDataPointUnix - currentDataPointUnix;
 
                   // Difference equals 1 day, then no scale pointValues is needed otherwise create one.
-                  return difference === oneDayInMs ? pointValues
-                    : [
+                  return difference === oneDayInMs ? pointValues : 
+                      [
                         ...pointValues,
                         {
                           startValue: currentDataPointUnix,
@@ -230,7 +266,7 @@ const Chart: React.FC<ChartParams> = ({
             {
               type: "candlestick",
               showInLegend: true,
-              name: "Stock Price",
+              name: "Stock Price Candlesticks",
               yValueFormatString: "$#,##0.00",
               xValueFormatString: "MMMM",
               dataPoints: chartFormatedData(stockData),
@@ -238,7 +274,7 @@ const Chart: React.FC<ChartParams> = ({
             {
               type: "line",
               showInLegend: true,
-              name: "Net Income",
+              name: "Stock Price lines",
               axisYType: "secondary",
               yValueFormatString: "$#,##0.00bn",
               xValueFormatString: "MMMM",

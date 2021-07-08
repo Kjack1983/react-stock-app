@@ -1,3 +1,6 @@
+/**
+ * Structure types constructed for the chart.
+ */
 export interface StockValues {
   date: string;
   open: number;
@@ -30,7 +33,7 @@ export interface ChartParams {
   time: string
 }
 
-export interface ReturnedMappedValues {
+export type ReturnedMappedValues = {
   company: string[];
   outputsize: string[];
   dayAdjOrIntraday: string[];
@@ -38,4 +41,19 @@ export interface ReturnedMappedValues {
   selectedValue: any;
   handleChangeValues: (event: any, name:string) => void
   stockData: any[];
+}
+
+type lineProps = {
+  x: string;
+  y: number;
+}
+
+export type stockPropsLine = {
+  expectedLineDate: lineProps[];
+}
+
+export type ReturnHookValueCheck = {
+  theme: string;
+  toogleAlter: () => void;
+  switchText: string;
 }
