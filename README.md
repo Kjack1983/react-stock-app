@@ -6,9 +6,13 @@
 
 ## Setup
 
+## Support candlesticks and line datapoints.
+
 npm install. Use npm start to start the development server on port 3000.
 
 Tech stack: #react #typescript #jest #enzyme
+
+
 
 ![Alt text](/src/screenshots/default.png?raw=true "images")
 
