@@ -248,13 +248,10 @@ const Chart: React.FC<ChartParams> = ({
                                     const oneDayInMs = 86400000;
 
                                     // Difference between the current and previous data points In milliseconds
-                                    const difference =
-                                        previousDataPointUnix -
-                                        currentDataPointUnix;
+                                    const difference = previousDataPointUnix - currentDataPointUnix;
 
                                     // Difference equals 1 day, then no scale pointValues is needed otherwise create one.
-                                    return difference === oneDayInMs
-                                        ? pointValues
+                                    return difference === oneDayInMs ? pointValues
                                         : [
                                               ...pointValues,
                                               {
