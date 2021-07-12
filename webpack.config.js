@@ -1,5 +1,5 @@
 const webpack = {
-    entry: './src/*',
+    entry: ['@babel/polyfill', './src/*'],
     output: {
         filename: 'target/bundle.js',
     },

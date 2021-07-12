@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
  */
 const chartFormatedData = (stockData: StockValues[]): FormatedStockValues[] => {
     return Array.isArray(stockData) && stockData.length
-        ? stockData.map((stockValue) => {
+        ? Array.from(stockData).map((stockValue) => {
               let { date, open, high, low, close } = stockValue;
               return {
                   x: new Date(date),
@@ -64,7 +64,7 @@ const chartFormatedData = (stockData: StockValues[]): FormatedStockValues[] => {
  * @return {array<stockPropsLine>} stockData
  */
 const chartFormatedDataLine = (stockData): stockPropsLine => {
-    return (
+	return (
         Array.isArray(stockData) &&
         stockData.length &&
         stockData.reduce((acc, { date, close }) => {
@@ -308,4 +308,4 @@ const Chart: React.FC<ChartParams> = ({
     );
 };
 
-export default Chart;
+export default React.memo(Chart);
