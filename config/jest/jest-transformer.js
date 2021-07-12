@@ -7,4 +7,3 @@ module.exports = {
     return 'module.exports = ' + JSON.stringify(path.basename(filename)) + ';';
   },
 };
-//module.exports = require("babel-jest").createTransformer(config);
