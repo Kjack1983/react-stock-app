@@ -211,13 +211,9 @@ const Chart: React.FC<ChartParams> = ({
                     axisY: {
                         prefix: "$",
                         // Minimum value is 10% less than the lowest price in the dataset
-                        minimum:
-                            Math.min(...stockData.map((data) => data.low)) /
-                            1.1,
+                        minimum: Math.min(...stockData.map((data) => data.low)) / 1.1,
                         // Minimum value is 10% more than the highest price in the dataset
-                        maximum:
-                            Math.max(...stockData.map((data) => data.high)) *
-                            1.1,
+                        maximum: Math.max(...stockData.map((data) => data.high)) * 1.1,
                         crosshair: {
                             enabled: true,
                             snapToDataPoint: true,
@@ -237,12 +233,8 @@ const Chart: React.FC<ChartParams> = ({
                                     if (index === 0) return pointValues;
 
                                     // Time in UNIX for current and previous data points
-                                    const currentDataPointUnix = Number(
-                                        new Date(candleLine.date)
-                                    );
-                                    const previousDataPointUnix = Number(
-                                        new Date(array[index - 1].date)
-                                    );
+                                    const currentDataPointUnix = Number(new Date(candleLine.date));
+                                    const previousDataPointUnix = Number(new Date(array[index - 1].date));
 
                                     // One day converted to milliseconds
                                     const oneDayInMs = 86400000;
