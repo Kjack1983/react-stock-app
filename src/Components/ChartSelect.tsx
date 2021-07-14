@@ -139,4 +139,4 @@ const ChartSelect: React.FC<selectorProps> = ({
     );
 };
 
-export default ChartSelect;
+export default React.memo(ChartSelect);
