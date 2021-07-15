@@ -64,12 +64,9 @@ const chartFormatedData = (stockData: StockValues[]): FormatedStockValues[] => {
  * @return {array<stockPropsLine>} stockData
  */
 const chartFormatedDataLine = (stockData): stockPropsLine => {
-	return (
+    return (
         Array.isArray(stockData) && stockData.length && stockData.reduce((acc, { date, close }) => {
-            return [
-				...acc, 
-				{ x: new Date(date), y: close }
-			];
+            return [...acc, { x: new Date(date), y: close }];
         }, [])
     );
 };
@@ -228,13 +225,18 @@ const Chart: React.FC<ChartParams> = ({
                             spacing: 0,
                             fillOpacity: 0,
                             lineThickness: 0,
-                            customBreaks: stockData.reduce((pointValues, candleLine, index, array) => {
+                            customBreaks: stockData.reduce(
+                                (pointValues, candleLine, index, array) => {
                                     // return on the first iteration since there is no previous data point
                                     if (index === 0) return pointValues;
 
                                     // Time in UNIX for current and previous data points
-                                    const currentDataPointUnix = Number(new Date(candleLine.date));
-                                    const previousDataPointUnix = Number(new Date(array[index - 1].date));
+                                    const currentDataPointUnix = Number(
+                                        new Date(candleLine.date)
+                                    );
+                                    const previousDataPointUnix = Number(
+                                        new Date(array[index - 1].date)
+                                    );
 
                                     // One day converted to milliseconds
                                     const oneDayInMs = 86400000;
@@ -279,7 +281,7 @@ const Chart: React.FC<ChartParams> = ({
                             name: "Stock Price Candlesticks",
                             yValueFormatString: "$#,##0.00",
                             xValueFormatString: "MMMM",
-                            dataPoints: chartFormatedData(stockData),
+                            dataPoints: chartFormatedData(stockData)
                         },
                         {
                             type: "line",
@@ -288,7 +290,7 @@ const Chart: React.FC<ChartParams> = ({
                             axisYType: "secondary",
                             yValueFormatString: "$#,##0.00bn",
                             xValueFormatString: "MMMM",
-                            dataPoints: chartFormatedDataLine(stockData),
+                            dataPoints: chartFormatedDataLine(stockData)
                         },
                     ],
                 }}
